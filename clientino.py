@@ -1,7 +1,7 @@
 #!/bin/python
 import argparse
 import re
-import subprocess
+import pexpect
 import requests
 import time
 from typing import TypedDict, cast, Iterable
@@ -30,18 +30,28 @@ def submit_flags(url: str, flags: list[Flag]) -> None:
         print(f"error submitting flags: {e}")
 
 
-def run_on_team(script: str, ip: Team, regex: str) -> list[Flag]:
+def run_on_team(script: str, ip: Team, regex: str, url: str) -> list[Flag]:
     try:
-        print(f"attacking team {ip}")
-        proc: subprocess.CompletedProcess[str] = subprocess.run(
-            [script, ip],
-            capture_output=True,
-            text=True,
-            check=True
+        found: list[Flag] = []
+        child: pexpect.spawn[str] = pexpect.spawn(
+            script, [ip],
+            encoding='utf-8',
+            codec_errors='ignore',
+            timeout=None,
+            maxread=1
         )
-        found_flags: list[Flag] = re.findall(regex, proc.stdout)
-        print(f"found {len(found_flags)} flags on team {ip}: {found_flags}")
-        return found_flags
+        try:
+            line: str
+            for line in child:
+                if line_flags := re.findall(regex, line):
+                    print(f"{ip}: {line_flags}")
+                    submit_flags(url, line_flags)
+                    found += line_flags
+        except pexpect.EOF:
+            pass
+        finally:
+            child.close()
+        return found
     except Exception as e:
         print(f"error on {ip}: {e}")
         return []
@@ -65,7 +75,7 @@ def main() -> None:
             all_flags: list[Flag] = []
             with ThreadPoolExecutor(max_workers=args.jobs) as executor:
                 results: Iterable[list[Flag]] = executor.map(
-                    lambda ip: run_on_team(str(args.script), ip, config['flag_regex']),
+                    lambda ip: run_on_team(str(args.script), ip, config['flag_regex'], url),
                     config['teams']
                 )
                 for f_list in results:
@@ -73,9 +83,7 @@ def main() -> None:
 
             flags: list[Flag] = list(set(all_flags))  # remove duplicates
             if flags:
-                # print(f"submitting {len(flags)} flags: {flags}")
-                print(f"submitting {len(flags)} flags")
-                submit_flags(url, flags)
+                print(f"attack round finished: submitted {len(flags)} unique flags")
         except Exception as e:
             print(f"error: {e}")
 
