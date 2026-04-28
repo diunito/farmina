@@ -27,12 +27,19 @@ it can be used like `./clientino.py -H host -P port exploit.py`, and it will run
 as with the other farms, the exploit script has to take 1 argument, which will be the currently attacked team's vm's IP address
 ### dependencies 
 - [`python-requests`](https://requests.readthedocs.io/)
+- [`python-pexpect`](https://pexpect.readthedocs.io/)
 
 # *types types types types*
-even tho it's a very simple farm, it's still strictly typed, so if you want to type check it, you need
+even tho it's a very simple farm, it's still strictly typed, so if you want to type check it, you need:
+
+for farmina:
 - a type checker for python (e.g. [`mypy`](https://mypy-lang.org/))
 - [`python-types-requests`](https://pypi.org/project/types-requests/)
 - [`python-types-peewee`](https://pypi.org/project/types-peewee/) note: `execute()` as is not typed yet, so you will need to tell the checker to ignore its untyped calls
+
+for clientino:
+- [`python-types-requests`](https://pypi.org/project/types-requests/)
+- [`python-types-pexpect`](https://pypi.org/project/types-pexpect/)
 
 _P.S. coming from haskell, type checking in python sucks, but it could also be that I don't have mypy set up correctly so idk_
 
