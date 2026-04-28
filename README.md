@@ -23,12 +23,14 @@ it can optionally print the sum of the points gained each time it submits a batc
 a very simple client for farmina
 
 it can be used like `./clientino.py -H host -P port exploit.py`, and it will run `exploit.py` (which can be any file marked as executable[^2]) every `-i`/`--interval` seconds[^3] using, each time, `-j`/`--jobs` concurrent subprocesses[^4], each ran against 1 team and will `POST` the flags found in the script's output (using `FLAG_REGEX`) to `http://host:port/flags`
+
+as with the other farms, the exploit script has to take 1 argument, which will be the currently attacked team's vm's IP address
 ### dependencies 
 - [`python-requests`](https://requests.readthedocs.io/)
 
 # *types types types types*
 even tho it's a very simple farm, it's still strictly typed, so if you want to type check it, you need
-- a type checker for python (e.g. [`mypy`](https://mypy-lang.org/)
+- a type checker for python (e.g. [`mypy`](https://mypy-lang.org/))
 - [`python-types-requests`](https://pypi.org/project/types-requests/)
 - [`python-types-peewee`](https://pypi.org/project/types-peewee/) note: `execute()` as is not typed yet, so you will need to tell the checker to ignore its untyped calls
 
