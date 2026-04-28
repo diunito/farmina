@@ -23,9 +23,11 @@ def get_config(url: str) -> FarmConfig:
 
 
 def submit_flags(url: str, flags: list[Flag]) -> None:
-    r: requests.Response = requests.post(f"{url}/flags", json=flags, timeout=5)
-    r.raise_for_status()
-    # print(r.text)
+    try:
+        r: requests.Response = requests.post(f"{url}/flags", json=flags, timeout=5)
+        r.raise_for_status()
+    except Exception as e:
+        print(f"error submitting flags: {e}")
 
 
 def run_on_team(script: str, ip: Team, regex: str) -> list[Flag]:
